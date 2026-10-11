@@ -7,6 +7,9 @@ export default function useAudioDevices() {
 
     const [inputDevices, setInputDevices] = useState<Device[]>([]);
     const [outputDevices, setOutputDevices] = useState<Device[]>([]);
+    const [selectedInputDeviceId, setSelectedInputDeviceId] = useState("");
+    const [selectedOutputDeviceId, setSelectedOutputDeviceId] = useState("");
+
 
 
     async function getAllDevices() {
@@ -33,6 +36,10 @@ export default function useAudioDevices() {
     return {
         inputDevices,
         outputDevices,
+        selectedInputDeviceId,
+        selectedOutputDeviceId,
+        setSelectedInputDeviceId,
+        setSelectedOutputDeviceId,
         getAllDevices
     }
      

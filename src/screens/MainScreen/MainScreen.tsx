@@ -13,12 +13,12 @@ import useAudioDevices from '../../hooks/useAudioDevices';
 
 export default function MainScreen() {
 
-  const {inputDevices, outputDevices, getAllDevices} = useAudioDevices();
+  const {inputDevices, outputDevices, getAllDevices, selectedInputDeviceId, selectedOutputDeviceId, setSelectedInputDeviceId, setSelectedOutputDeviceId} = useAudioDevices();
 
-  return (
+  return ( 
     <div>
       <button onClick={getAllDevices}>Load Devices</button>
-      <DeviceSelector inputDevices = {inputDevices} outputDevices = {outputDevices}/>
+      <DeviceSelector inputDevices = {inputDevices} outputDevices = {outputDevices} onInputDeviceChange = {setSelectedInputDeviceId} onOutputDeviceChange={setSelectedOutputDeviceId} selectedInputDeviceId={selectedInputDeviceId} selectedOutputDeviceId={selectedOutputDeviceId}/>
       <NoteDisplay />
     <PianoKeyboard />
     </div>
