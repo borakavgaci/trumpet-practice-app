@@ -1,5 +1,7 @@
 import { PitchedNote } from "../../types/note";
 
+import formatPitchedNote from "../../utils/formatPitchedNote";
+
 type NoteDisplayProps = {
         concertNote: PitchedNote | null;
         trumpetNote: PitchedNote | null;
@@ -13,8 +15,8 @@ export default function NoteDisplay({concertNote, trumpetNote, frequency, isList
     return (
         <div>
             <h1>Note Display</h1>
-            <h2>Concert Note: {concertNote?.noteName}{concertNote?.octave}</h2>
-            <h2>Trumpet Note: {trumpetNote?.noteName}{trumpetNote?.octave}</h2>
+            <h2>Concert Note: {formatPitchedNote(concertNote)} </h2>
+            <h2>Trumpet Note: {formatPitchedNote(trumpetNote)}</h2>
 
             
 
