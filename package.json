@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
+    "pitchy": "^4.1.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   }

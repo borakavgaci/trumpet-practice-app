@@ -8,9 +8,11 @@ import type {Device} from "/Users/bokav/Desktop/trumtrum/my-new-app/src/types/de
 
 import useAudioDevices from '../../hooks/useAudioDevices';
 import useMicrophoneInput from '../../hooks/useMicrophoneInput';
+import usePitchDetection from '../../hooks/usePitchDetection';
 
 import transposeNote from '../../utils/transposeNote';
 import { PitchedNote } from '../../types/note';
+import frequencyToPitchedNote from '../../utils/frequencyToPitchedNote';
 
 
 
@@ -18,12 +20,18 @@ export default function MainScreen() {
 
   const {inputDevices, outputDevices, getAllDevices, selectedInputDeviceId, selectedOutputDeviceId, setSelectedInputDeviceId, setSelectedOutputDeviceId} = useAudioDevices();
   const {stream, isListening, error, startListening, stopListening} = useMicrophoneInput();
-  const concertNote: PitchedNote = {
-    noteName: "B",
-    octave: 2,
+  const {volume, pitch, clarity} = usePitchDetection(stream);
+
+  const concertNote = frequencyToPitchedNote(pitch);
+  let trumpetNote: PitchedNote | null = null;
+
+  if(concertNote === null) {
+    trumpetNote = concertNote;
   }
-  const trumpetNote = transposeNote(concertNote, 2);
-  const frequency = 440
+  else {
+    trumpetNote = transposeNote(concertNote,2);
+  }
+
   
 
 
@@ -34,7 +42,9 @@ export default function MainScreen() {
       <button onClick={stopListening}>Stop Audio</button>
 
       <DeviceSelector inputDevices = {inputDevices} outputDevices = {outputDevices} onInputDeviceChange = {setSelectedInputDeviceId} onOutputDeviceChange={setSelectedOutputDeviceId} selectedInputDeviceId={selectedInputDeviceId} selectedOutputDeviceId={selectedOutputDeviceId}/>
-      <NoteDisplay concertNote={concertNote} trumpetNote={trumpetNote} frequency={frequency} isListening={isListening}/>
+      <NoteDisplay concertNote={concertNote} trumpetNote={trumpetNote} frequency={pitch} isListening={isListening}/>
+
+
     <PianoKeyboard />
     </div>
   );
