@@ -1,0 +1,11 @@
+.piano-key {
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.piano-key.active {
+  background-color: lightblue;
+}

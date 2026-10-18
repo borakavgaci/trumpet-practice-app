@@ -5,7 +5,7 @@ import formatPitchedNote from "../../utils/formatPitchedNote";
 type NoteDisplayProps = {
         concertNote: PitchedNote | null;
         trumpetNote: PitchedNote | null;
-        frequency: number;
+        frequency: number | null;
         isListening: boolean;
 }
 

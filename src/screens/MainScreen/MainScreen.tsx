@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 
 import DeviceSelector from '../../components/DeviceSelector/DeviceSelector';
 import NoteDisplay from '../../components/NoteDisplay/NoteDisplay';
@@ -13,10 +14,13 @@ import usePitchDetection from '../../hooks/usePitchDetection';
 import transposeNote from '../../utils/transposeNote';
 import { PitchedNote } from '../../types/note';
 import frequencyToPitchedNote from '../../utils/frequencyToPitchedNote';
+import { PianoKey } from "../../data/pianoKeys";
 
 
 
 export default function MainScreen() {
+
+  const [activeKeys, setActiveKeys] = useState<number[]>([]);
 
   const {inputDevices, outputDevices, getAllDevices, selectedInputDeviceId, selectedOutputDeviceId, setSelectedInputDeviceId, setSelectedOutputDeviceId} = useAudioDevices();
   const {stream, isListening, error, startListening, stopListening} = useMicrophoneInput();
@@ -32,7 +36,23 @@ export default function MainScreen() {
     trumpetNote = transposeNote(concertNote,2);
   }
 
-  
+  function activeKey(midiNumber:number) {
+    setActiveKeys(previousKeys => {
+      if(previousKeys.includes(midiNumber)) {
+        return previousKeys;
+      }
+      else {
+        return previousKeys.concat(midiNumber);
+      }
+    });
+  }
+
+  function deactiveKey(midiNumber:number) {
+    setActiveKeys(previousKeys => {
+      const currentKeys = previousKeys.filter(keyId => keyId !== midiNumber);
+      return currentKeys;
+    });
+  }
 
 
   return ( 
@@ -45,7 +65,8 @@ export default function MainScreen() {
       <NoteDisplay concertNote={concertNote} trumpetNote={trumpetNote} frequency={pitch} isListening={isListening}/>
 
 
-    <PianoKeyboard />
+    <PianoKeyboard onActiveKey={activeKey} onDeactiveKey={deactiveKey} activeKeys={activeKeys}/>
+
     </div>
   );
 }
