@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import DeviceSelector from '../../components/DeviceSelector/DeviceSelector';
 import NoteDisplay from '../../components/NoteDisplay/NoteDisplay';
@@ -53,6 +53,19 @@ export default function MainScreen() {
       return currentKeys;
     });
   }
+
+  
+
+useEffect(() => {
+    function handleWindowBlur() {
+    setActiveKeys([]);
+  }
+  window.addEventListener("blur", handleWindowBlur);
+
+  return () => {
+    window.removeEventListener("blur", handleWindowBlur);
+  };
+}, []);
 
 
   return ( 
