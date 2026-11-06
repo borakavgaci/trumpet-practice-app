@@ -10,11 +10,13 @@ import type {Device} from "/Users/bokav/Desktop/trumtrum/my-new-app/src/types/de
 import useAudioDevices from '../../hooks/useAudioDevices';
 import useMicrophoneInput from '../../hooks/useMicrophoneInput';
 import usePitchDetection from '../../hooks/usePitchDetection';
+import useMidiInput from "../../hooks/useMidiInput";
 
 import transposeNote from '../../utils/transposeNote';
 import { PitchedNote } from '../../types/note';
 import frequencyToPitchedNote from '../../utils/frequencyToPitchedNote';
 import { PianoKey } from "../../data/pianoKeys";
+
 
 import useInstrumentAudio from "../../hooks/useInstrumentAudio";
 
@@ -28,6 +30,8 @@ export default function MainScreen() {
   const {stream, isListening, error, startListening, stopListening} = useMicrophoneInput();
   const {volume, pitch, clarity} = usePitchDetection(stream);
   const {initializeAudio, playNote, stopNote, stopAllNotes} = useInstrumentAudio();
+  const {initializeMidi, midiInputsArray} = useMidiInput();
+
   const concertNote = frequencyToPitchedNote(pitch);
   let trumpetNote: PitchedNote | null = null;
 
@@ -83,7 +87,8 @@ useEffect(() => {
       <NoteDisplay concertNote={concertNote} trumpetNote={trumpetNote} frequency={pitch} isListening={isListening}/>
 
     <button onClick={initializeAudio}>Start Piano</button>
-    <button>MIDI Bağla</button>
+    <button onClick={initializeMidi}>MIDI Bağla</button>
+    <select>{midiInputsArray.map((midiInput) => <option key={midiInput.id} value={midiInput.id}>{midiInput.name}</option>)}</select>
     <PianoKeyboard onActiveKey={activeKey} onDeactiveKey={deactiveKey} activeKeys={activeKeys}/>
 
     </div>
