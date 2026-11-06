@@ -4,15 +4,19 @@ import { PitchDetector } from "pitchy";
 export default function usePitchDetection(stream: MediaStream | null) {
       
     const [volume, setVolume] = useState(0);
-    const [pitch, setPitch] = useState(null);
+    const [pitch, setPitch] = useState<number | null>(null);
     const [clarity, setClarity] = useState(0);
     
     useEffect(() => {
         if (stream === null) {
             console.log("stream is null");
+            setPitch(null);
+            setVolume(0);
+            setClarity(0);
             return;
         }
 
+        let animationFrameId: number | null = null;
 
          
         
@@ -42,9 +46,17 @@ export default function usePitchDetection(stream: MediaStream | null) {
 
                 const [pitch, clarity] = detector.findPitch(dataArray, audioCtx.sampleRate);
 
-                 setPitch(pitch);
+                if(Number.isFinite(pitch) && avgSqrt >= 0.01 && clarity >= 0.9 && pitch > 0) {
+                    setPitch(pitch);
+                }
+                else {
+                    setPitch(null);
+                }
                 setClarity(clarity);
-                requestAnimationFrame(analyze)
+                animationFrameId = requestAnimationFrame(analyze)
+
+                
+
             }
 
             
@@ -57,8 +69,11 @@ export default function usePitchDetection(stream: MediaStream | null) {
             analyze();
                 
         
-        
         return () => {
+            if(animationFrameId != null) {
+                    cancelAnimationFrame(animationFrameId);
+            }
+
             source.disconnect();
             analyser.disconnect();
             audioCtx.close();

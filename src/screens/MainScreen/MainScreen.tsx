@@ -16,6 +16,8 @@ import { PitchedNote } from '../../types/note';
 import frequencyToPitchedNote from '../../utils/frequencyToPitchedNote';
 import { PianoKey } from "../../data/pianoKeys";
 
+import useInstrumentAudio from "../../hooks/useInstrumentAudio";
+
 
 
 export default function MainScreen() {
@@ -25,7 +27,7 @@ export default function MainScreen() {
   const {inputDevices, outputDevices, getAllDevices, selectedInputDeviceId, selectedOutputDeviceId, setSelectedInputDeviceId, setSelectedOutputDeviceId} = useAudioDevices();
   const {stream, isListening, error, startListening, stopListening} = useMicrophoneInput();
   const {volume, pitch, clarity} = usePitchDetection(stream);
-
+  const {initializeAudio, playNote, stopNote, stopAllNotes} = useInstrumentAudio();
   const concertNote = frequencyToPitchedNote(pitch);
   let trumpetNote: PitchedNote | null = null;
 
@@ -45,6 +47,7 @@ export default function MainScreen() {
         return previousKeys.concat(midiNumber);
       }
     });
+    playNote(midiNumber);
   }
 
   function deactiveKey(midiNumber:number) {
@@ -52,6 +55,7 @@ export default function MainScreen() {
       const currentKeys = previousKeys.filter(keyId => keyId !== midiNumber);
       return currentKeys;
     });
+    stopNote(midiNumber);
   }
 
   
@@ -59,13 +63,14 @@ export default function MainScreen() {
 useEffect(() => {
     function handleWindowBlur() {
     setActiveKeys([]);
+    stopAllNotes();
   }
   window.addEventListener("blur", handleWindowBlur);
 
   return () => {
     window.removeEventListener("blur", handleWindowBlur);
   };
-}, []);
+}, [stopAllNotes]);
 
 
   return ( 
@@ -77,7 +82,8 @@ useEffect(() => {
       <DeviceSelector inputDevices = {inputDevices} outputDevices = {outputDevices} onInputDeviceChange = {setSelectedInputDeviceId} onOutputDeviceChange={setSelectedOutputDeviceId} selectedInputDeviceId={selectedInputDeviceId} selectedOutputDeviceId={selectedOutputDeviceId}/>
       <NoteDisplay concertNote={concertNote} trumpetNote={trumpetNote} frequency={pitch} isListening={isListening}/>
 
-
+    <button onClick={initializeAudio}>Start Piano</button>
+    <button>MIDI Bağla</button>
     <PianoKeyboard onActiveKey={activeKey} onDeactiveKey={deactiveKey} activeKeys={activeKeys}/>
 
     </div>

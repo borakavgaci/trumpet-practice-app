@@ -3,11 +3,11 @@ import { NoteName } from "../types/note";
 
 export default function frequencyToPitchedNote(frequency: number | null) {
 
-    if(frequency === null) {
+    if(frequency === null || frequency === 0 || frequency < 0 || !Number.isFinite(frequency)) {
         return null;
     }
     
-    const midiNumber = 69 + 12 * Math.log(frequency / 440);
+    const midiNumber = 69 + 12 * Math.log2(frequency / 440);
     const roundedMidiNumber = Math.round(midiNumber);
     const noteIndex = roundedMidiNumber % 12;
     const octave = Math.floor(roundedMidiNumber / 12) - 1;
