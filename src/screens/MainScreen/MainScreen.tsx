@@ -30,7 +30,7 @@ export default function MainScreen() {
   const {stream, isListening, error, startListening, stopListening} = useMicrophoneInput();
   const {volume, pitch, clarity} = usePitchDetection(stream);
   const {initializeAudio, playNote, stopNote, stopAllNotes} = useInstrumentAudio();
-  const {initializeMidi, midiInputsArray} = useMidiInput();
+  const {initializeMidi, midiInputsArray, selectedMidiInputId, setSelectedMidiInputId} = useMidiInput();
 
   const concertNote = frequencyToPitchedNote(pitch);
   let trumpetNote: PitchedNote | null = null;
@@ -88,7 +88,9 @@ useEffect(() => {
 
     <button onClick={initializeAudio}>Start Piano</button>
     <button onClick={initializeMidi}>MIDI Bağla</button>
-    <select>{midiInputsArray.map((midiInput) => <option key={midiInput.id} value={midiInput.id}>{midiInput.name}</option>)}</select>
+    <select onChange={(event) => setSelectedMidiInputId(event.currentTarget.value)} value={selectedMidiInputId}><option value={""}>MIDI Girişi Seç</option>
+      {midiInputsArray.map((midiInput) => <option key={midiInput.id} value={midiInput.id}>{midiInput.name}</option>)}
+      </select>
     <PianoKeyboard onActiveKey={activeKey} onDeactiveKey={deactiveKey} activeKeys={activeKeys}/>
 
     </div>

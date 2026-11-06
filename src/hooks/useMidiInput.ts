@@ -3,6 +3,7 @@ import { useState } from "react";
 export default function useMidiInput() {
 
     const [midiInputsArray, setMidiInputsArray] = useState<MIDIInput[]>([]);
+    const [selectedMidiInputId, setSelectedMidiInputId] = useState("");
 
     async function initializeMidi() {
         const midiAccess = await navigator.requestMIDIAccess();
@@ -12,6 +13,6 @@ export default function useMidiInput() {
     }
 
     return {
-        initializeMidi, midiInputsArray
+        initializeMidi, midiInputsArray, selectedMidiInputId, setSelectedMidiInputId
     }
 }
