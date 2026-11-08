@@ -1,0 +1,20 @@
+Instrument sample credits
+
+Collection: tonejs-instruments
+Collection author/editor: Nicholaus P. Brosowsky
+Source: https://github.com/nbrosowsky/tonejs-instruments
+Source revision: 622c2f1c32c8cfce4158ddc3eb26e518ddef37e5
+Sample license: Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+License: https://creativecommons.org/licenses/by/3.0/
+Upstream license statement:
+https://github.com/nbrosowsky/tonejs-instruments/blob/622c2f1c32c8cfce4158ddc3eb26e518ddef37e5/LICENSE.md
+Upstream original-source information:
+https://github.com/nbrosowsky/tonejs-instruments/blob/622c2f1c32c8cfce4158ddc3eb26e518ddef37e5/sample-source-info.txt
+
+Piano: samples/piano/C4.mp3, stored as samples_piano_C4.mp3.
+Trumpet: samples/trumpet/F3.mp3, A3.mp3, C4.mp3, Ds4.mp3, F4.mp3,
+G4.mp3, As4.mp3, D5.mp3, F5.mp3, A5.mp3 and C6.mp3.
+
+The MP3 audio files are copied without audio edits. The piano filename was
+changed. During playback, Tone.js adjusts pitch, velocity, volume and release.
+The app does not imply endorsement by the collection's author or sample makers.
