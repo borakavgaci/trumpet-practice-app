@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 
-export default function useMicrophoneInput() {
+export default function useMicrophoneInput(deviceId = "") {
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isListening, setIsListening] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -11,7 +11,9 @@ export default function useMicrophoneInput() {
         setError(null);
 
         try {
-            const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true});
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                audio: deviceId ? { deviceId: { exact: deviceId } } : true,
+            });
             setStream(mediaStream);
             setIsListening(true);
             console.log("startListening called!")

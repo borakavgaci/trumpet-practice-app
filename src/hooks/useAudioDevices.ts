@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Device } from "../types/device";
 
 
@@ -12,7 +12,7 @@ export default function useAudioDevices() {
 
 
 
-    async function getAllDevices() {
+    const getAllDevices = useCallback(async () => {
         const rawDevices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
         const tempInputDevices = rawDevices.filter((rawDevice) => rawDevice.kind === "audioinput");
@@ -28,7 +28,7 @@ export default function useAudioDevices() {
         setOutputDevices(mappedOutputDevices)
 
 
-    }
+    }, []);
     
 
 

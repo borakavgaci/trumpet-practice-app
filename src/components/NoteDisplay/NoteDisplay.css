@@ -1,0 +1,72 @@
+.note-display { width: 100%; min-width: 0; text-align: center; }
+.tuner-heading { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 5px; line-height: 14px; }
+.tuner-status { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: #657360; }
+.tuner-status .status-dot { width: 5px; height: 5px; }
+.tuner-status.is-listening { color: #5a7950; }
+.tuner-status.is-listening .status-dot { background: #7e9c65; }
+.has-reading.tuning-flat .tuner-status, .has-reading.tuning-sharp .tuner-status { color: #7c6233; }
+.has-reading.tuning-flat .tuner-status .status-dot, .has-reading.tuning-sharp .tuner-status .status-dot { background: #b6975e; }
+.note-context { display: block; font-size: 8px; line-height: 12px; letter-spacing: 2px; color: #657360; }
+.pitch-note { height: 104px; margin: -2px 0 0; display: flex; align-items: baseline; justify-content: center; font-size: 104px; font-weight: 400; letter-spacing: -6px; line-height: 1; color: #304c3b; font-variant-numeric: tabular-nums; }
+.note-octave { font-size: 43px; font-weight: 400; letter-spacing: -2px; margin-left: 3px; }
+.empty-note { font-size: 88px; color: #c0cab8; font-weight: 300; line-height: 1.05; }
+.transposed-note { display: flex; justify-content: center; align-items: center; gap: 12px; min-height: 44px; font-size: 12px; color: #657360; }
+.transposed-note strong { min-width: 52px; color: #385c3f; font-size: 40px; line-height: 1.1; font-weight: 500; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.note-divider { width: 1px; height: 22px; background: #d7dfcf; }
+.tuning-gauge { width: min(84%, 1000px); padding: 0 20px; margin: 22px auto 0; }
+.gauge-note-labels, .gauge-scale { position: relative; font-variant-numeric: tabular-nums; }
+.gauge-note-labels { height: 26px; }
+.gauge-note-label { position: absolute; top: 0; min-width: 30px; transform: translateX(-50%); color: #758375; font-size: 12px; line-height: 22px; white-space: nowrap; }
+.gauge-note-label.is-distant { color: #8a9689; font-size: 11px; }
+.gauge-note-label.is-reference { color: #355e47; font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
+.gauge-track { position: relative; height: 52px; margin-top: 5px; }
+.gauge-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, #dce3d8, #aabca6 50%, #dce3d8); }
+.gauge-axis { position: absolute; inset: 0; overflow: hidden; }
+.gauge-center-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #b2c5ac; }
+.gauge-in-tune-zone { position: absolute; top: 3px; bottom: 3px; border: 1px solid #cdddc6; border-radius: 9px; background: #dfebd9a6; }
+.gauge-tick { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 1px; height: 10px; background: #c4d0be; }
+.gauge-tick.half-tick { height: 18px; background: #b3c2ac; }
+.gauge-tick.major-tick { height: 32px; background: #8fa685; }
+.gauge-needle { position: absolute; top: 6px; width: 3px; height: 40px; border-radius: 2px; background: #356b4e; transform: translateX(-50%); box-shadow: 0 0 0 2px #f4f5f0; will-change: left; }
+.gauge-needle > span { position: absolute; left: 50%; top: -5px; width: 11px; height: 11px; background: inherit; transform: translateX(-50%); border-radius: 50%; box-shadow: 0 0 0 3px #f4f5f0, 0 0 0 6px #356b4e12; }
+.gauge-needle.is-detuned { background: #a78346; }
+.gauge-needle.is-detuned > span { box-shadow: 0 0 0 3px #f4f5f0, 0 0 0 6px #a7834612; }
+.gauge-scale { height: 12px; font-size: 9px; line-height: 12px; color: #8a9689; margin-top: 8px; }
+.gauge-scale > span { position: absolute; min-width: 30px; transform: translateX(-50%); }
+.gauge-scale > span:nth-child(3) { color: #5f7c57; }
+.reading-values { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: 12px; line-height: 20px; }
+.reading-values > span:not(.values-divider) { display: flex; align-items: baseline; gap: 9px; }
+.value-label { font-size: 8px; letter-spacing: 1.2px; color: #657360; }
+.reading-values strong { font-size: 14px; font-weight: 500; color: #61715c; font-variant-numeric: tabular-nums; }
+.reading-values strong span { font-size: 10px; color: #657360; font-weight: 400; }
+.values-divider { height: 11px; width: 1px; background: #d9e1d1; }
+.tuning-flat .cents-value, .tuning-sharp .cents-value { color: #7c6233; }
+.tuner-hint { margin: 9px 0 0; font-size: 11px; line-height: 14px; color: #657360; }
+@media (max-width: 620px) {
+  .tuning-gauge { width: 100%; padding: 0 20px; }
+  .pitch-note { font-size: 100px; height: 104px; }
+  .note-octave { font-size: 39px; }
+  .reading-values { gap: 17px; }
+  .reading-values > span:not(.values-divider) { gap: 7px; }
+}
+
+@media (max-height: 820px) {
+  .pitch-note { font-size: 76px; height: 76px; }
+  .note-octave { font-size: 33px; }
+  .empty-note { font-size: 68px; }
+  .transposed-note { min-height: 36px; }
+  .transposed-note strong { font-size: 32px; }
+  .tuning-gauge { margin-top: 12px; }
+  .gauge-note-labels { height: 22px; }
+  .gauge-note-label.is-reference { font-size: 15px; }
+  .gauge-track { height: 38px; margin-top: 4px; }
+  .gauge-needle { top: 4px; height: 30px; }
+  .gauge-tick.major-tick { height: 26px; }
+  .gauge-scale { margin-top: 6px; }
+  .reading-values { margin-top: 8px; line-height: 18px; }
+  .tuner-hint { display: none; }
+}
+
+@media (max-height: 660px) {
+  .note-display { zoom: 0.85; }
+}

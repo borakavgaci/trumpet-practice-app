@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 
@@ -8,14 +8,20 @@ if (started) {
 }
 
 const createWindow = () => {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: Math.min(1440, width),
+    height: Math.min(1000, height),
+    minWidth: Math.min(960, width),
+    minHeight: Math.min(700, height),
+    title: 'Akort & Klavye',
+    backgroundColor: '#f4f5f0',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+  mainWindow.maximize();
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -26,8 +32,6 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

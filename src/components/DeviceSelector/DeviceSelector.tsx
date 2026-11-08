@@ -1,38 +1,15 @@
-import type {DeviceSelectorProps} from "/Users/bokav/Desktop/trumtrum/my-new-app/src/types/device.ts"
-import type { Device } from "/Users/bokav/Desktop/trumtrum/my-new-app/src/types/device.ts";
+import type { DeviceSelectorProps } from "../../types/device";
 
-import useAudioDevices from "../../hooks/useAudioDevices";
-import { ChangeEvent } from "react";
-
-export default function DeviceSelector({inputDevices, outputDevices, selectedInputDeviceId, selectedOutputDeviceId, onInputDeviceChange, onOutputDeviceChange}: DeviceSelectorProps) {
- 
-  function handleInputDeviceChange(changeEvent: ChangeEvent<HTMLSelectElement>) {
-    selectedInputDeviceId = changeEvent.target.value
-    console.log((inputDevices.find((Device) => Device.id === selectedInputDeviceId))?.label)
-    return selectedInputDeviceId;
-  }
-  function handleOutputDeviceChange(changeEvent: ChangeEvent<HTMLSelectElement>) {
-    selectedOutputDeviceId = changeEvent.target.value
-    console.log((outputDevices.find((Device) => Device.id === selectedOutputDeviceId))?.label)
-    return selectedOutputDeviceId;
-  }
-
- 
+export default function DeviceSelector({ inputDevices, selectedInputDeviceId, onInputDeviceChange, disabled = false }: DeviceSelectorProps) {
   return (
-    <div>
-      <h1>Device Selector</h1>
-      
-
-      <h2>Input Devices</h2>
-      <select onChange={handleInputDeviceChange} value={selectedInputDeviceId}>
-      {inputDevices.map((Devices) => (<option key={Devices.id} value={Devices.id}>{Devices.label}</option>))}
+    <label className="select-field">
+      <span className="sr-only">Mikrofon</span>
+      <select aria-label="Mikrofon" value={selectedInputDeviceId} onChange={event => onInputDeviceChange(event.currentTarget.value)} disabled={disabled}>
+        <option value="">Sistem varsayılanı</option>
+        {inputDevices.filter(device => device.id && device.id !== "default").map((device, index) => (
+          <option key={device.id} value={device.id}>{device.label || `Mikrofon ${index + 1}`}</option>
+        ))}
       </select>
-    
-      <h2>Output Devices</h2>
-      <select onChange={handleOutputDeviceChange} value={selectedOutputDeviceId}>
-      {outputDevices.map((Devices) => (<option key={Devices.id} value={Devices.id}>{Devices.label}</option>))}
-      </select>
-
-    </div>
+    </label>
   );
 }

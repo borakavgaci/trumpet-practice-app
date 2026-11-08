@@ -1,88 +1,59 @@
 import { useEffect, useState } from "react";
 import { PitchDetector } from "pitchy";
+import { PitchTuning } from "../types/pitchTuning";
+import createPitchTracker from "../utils/createPitchTracker";
+
+type PitchReading = {
+    volume: number;
+    pitch: number | null;
+    clarity: number;
+    tuning: PitchTuning | null;
+};
+
+const EMPTY_READING: PitchReading = { volume: 0, pitch: null, clarity: 0, tuning: null };
 
 export default function usePitchDetection(stream: MediaStream | null) {
-      
-    const [volume, setVolume] = useState(0);
-    const [pitch, setPitch] = useState<number | null>(null);
-    const [clarity, setClarity] = useState(0);
-    
+    const [reading, setReading] = useState<PitchReading>(EMPTY_READING);
+
     useEffect(() => {
         if (stream === null) {
-            console.log("stream is null");
-            setPitch(null);
-            setVolume(0);
-            setClarity(0);
+            setReading(EMPTY_READING);
             return;
         }
 
         let animationFrameId: number | null = null;
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        const dataArray = new Float32Array(analyser.fftSize);
+        source.connect(analyser);
+        const detector = PitchDetector.forFloat32Array(dataArray.length);
+        const tracker = createPitchTracker();
 
-         
-        
-            const audioCtx = new AudioContext();
-            
-            const source = audioCtx.createMediaStreamSource(stream);
-            
-            const analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 1024;
-            const bufferLength = analyser.fftSize;
-            const dataArray = new Float32Array(bufferLength);
+        function analyze(timestamp = performance.now()) {
+            analyser.getFloatTimeDomainData(dataArray);
+            let sumOfSquares = 0;
+            dataArray.forEach(value => { sumOfSquares += value * value; });
+            const volume = Math.sqrt(sumOfSquares / dataArray.length);
+            const [frequency, clarity] = detector.findPitch(dataArray, audioCtx.sampleRate);
+            const pitch = Number.isFinite(frequency) && frequency > 0 && volume >= 0.01 &&
+                Number.isFinite(clarity) && clarity >= 0.9 ? frequency : null;
 
-            source.connect(analyser);
-            const detector = PitchDetector.forFloat32Array(dataArray.length);
+            setReading({ volume, pitch, clarity, tuning: tracker.update(pitch, timestamp) });
+            animationFrameId = requestAnimationFrame(analyze);
+        }
 
-
-            function analyze() {
-            
-                let sumOfSquares = 0;
-
-                analyser.getFloatTimeDomainData(dataArray)
-                dataArray.forEach((value) => sumOfSquares += value*value);
-
-                const avg = sumOfSquares / dataArray.length;
-                const avgSqrt = Math.sqrt(avg);
-                setVolume(avgSqrt);
-
-                const [pitch, clarity] = detector.findPitch(dataArray, audioCtx.sampleRate);
-
-                if(Number.isFinite(pitch) && avgSqrt >= 0.01 && clarity >= 0.9 && pitch > 0) {
-                    setPitch(pitch);
-                }
-                else {
-                    setPitch(null);
-                }
-                setClarity(clarity);
-                animationFrameId = requestAnimationFrame(analyze)
-
-                
-
-            }
-
-            
-           
-
-
-
-
-        
-            analyze();
-                
-        
+        analyze();
         return () => {
-            if(animationFrameId != null) {
-                    cancelAnimationFrame(animationFrameId);
-            }
-
+            if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+            tracker.reset();
             source.disconnect();
             analyser.disconnect();
-            audioCtx.close();
+            void audioCtx.close();
         };
-    },[stream]);
+    }, [stream]);
 
-    return {
-            volume,
-            pitch,
-            clarity
-    }
+    // Stopping the microphone hides the previous reading immediately, before effects run.
+    return stream === null ? EMPTY_READING : reading;
 }

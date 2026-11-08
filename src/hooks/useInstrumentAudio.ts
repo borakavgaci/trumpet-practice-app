@@ -9,6 +9,10 @@ const unloadedInstruments = (): Record<InstrumentId, boolean> => ({
   trumpet: false,
 });
 
+type OutputAudioContext = AudioContext & {
+  setSinkId?: (deviceId: string) => Promise<void>;
+};
+
 export default function useInstrumentAudio() {
   const [instrument, setInstrument] = useState<InstrumentId>("piano");
   const [loadedInstruments, setLoadedInstruments] = useState(unloadedInstruments);
@@ -16,6 +20,12 @@ export default function useInstrumentAudio() {
   const [audioError, setAudioError] = useState<string | null>(null);
   const [isAudioStarted, setIsAudioStarted] = useState(false);
   const [isAudioStarting, setIsAudioStarting] = useState(false);
+  const [outputDeviceId, setOutputDeviceId] = useState("");
+  const [outputError, setOutputError] = useState<string | null>(null);
+  const [canSelectOutput, setCanSelectOutput] = useState(false);
+  const [isOutputChanging, setIsOutputChanging] = useState(false);
+  const contextRef = useRef<Tone.Context | null>(null);
+  const outputChangingRef = useRef(false);
   const samplersRef = useRef<Partial<Record<InstrumentId, Tone.Sampler>>>({});
   const loadedRef = useRef(unloadedInstruments());
   const instrumentRef = useRef<InstrumentId>("piano");
@@ -35,13 +45,14 @@ export default function useInstrumentAudio() {
   }, []);
 
   const initializeAudio = useCallback(async () => {
-    if (isAudioStartedRef.current || isAudioStartingRef.current) return;
+    const context = contextRef.current;
+    if (!context || isAudioStartedRef.current || isAudioStartingRef.current) return;
 
     isAudioStartingRef.current = true;
     setIsAudioStarting(true);
     setAudioError(null);
     try {
-      await Tone.start();
+      await context.resume();
       if (!isMountedRef.current) return;
 
       isAudioStartedRef.current = true;
@@ -56,6 +67,27 @@ export default function useInstrumentAudio() {
       if (isMountedRef.current) setIsAudioStarting(false);
     }
   }, [resumeHeldNotes]);
+
+  const selectOutput = useCallback(async (deviceId: string) => {
+    const context = contextRef.current?.rawContext as OutputAudioContext | undefined;
+    if (!context || outputChangingRef.current) return;
+    if (typeof context.setSinkId !== "function") {
+      if (deviceId) setOutputError("Bu ortamda ses çıkışı seçimi desteklenmiyor.");
+      return;
+    }
+    outputChangingRef.current = true;
+    setIsOutputChanging(true);
+    setOutputError(null);
+    try {
+      await context.setSinkId(deviceId);
+      if (isMountedRef.current) setOutputDeviceId(deviceId);
+    } catch (error) {
+      if (isMountedRef.current) setOutputError(error instanceof Error ? error.message : String(error));
+    } finally {
+      outputChangingRef.current = false;
+      if (isMountedRef.current) setIsOutputChanging(false);
+    }
+  }, []);
 
   const selectInstrument = useCallback((nextInstrument: InstrumentId) => {
     if (nextInstrument === instrumentRef.current) return;
@@ -97,12 +129,17 @@ export default function useInstrumentAudio() {
   useEffect(() => {
     let disposed = false;
     isMountedRef.current = true;
+    // Own a native context so output selection applies directly to both samplers.
+    const context = new Tone.Context(new AudioContext({ latencyHint: "interactive" }));
+    contextRef.current = context;
+    setCanSelectOutput(typeof (context.rawContext as OutputAudioContext).setSinkId === "function");
     loadedRef.current = unloadedInstruments();
     setLoadedInstruments(unloadedInstruments());
 
     instrumentIds.forEach(id => {
       const definition = instruments[id];
       const sampler = new Tone.Sampler({
+        context,
         urls: definition.urls,
         release: definition.release,
         volume: definition.volume,
@@ -140,6 +177,8 @@ export default function useInstrumentAudio() {
       });
       samplersRef.current = {};
       loadedRef.current = unloadedInstruments();
+      contextRef.current = null;
+      context.dispose();
     };
   }, [resumeHeldNotes]);
 
@@ -154,5 +193,10 @@ export default function useInstrumentAudio() {
     playNote,
     stopNote,
     stopAllNotes,
+    outputDeviceId,
+    selectOutput,
+    outputError,
+    canSelectOutput,
+    isOutputChanging,
   };
 }
