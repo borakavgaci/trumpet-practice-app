@@ -12,7 +12,7 @@ import useMidiInput from "../../hooks/useMidiInput";
 
 import transposeNote from '../../utils/transposeNote';
 import { PitchedNote } from '../../types/note';
-import frequencyToPitchedNote from '../../utils/frequencyToPitchedNote';
+import getPitchTuning from '../../utils/getPitchTuning';
 import { pianoKeys } from "../../data/pianoKeys";
 import { instruments, instrumentIds } from "../../data/instruments";
 
@@ -29,15 +29,16 @@ export default function MainScreen() {
   const activeNoteSourcesRef = useRef(new Map<number, Set<NoteSource>>());
 
   const {inputDevices, outputDevices, getAllDevices, selectedInputDeviceId, selectedOutputDeviceId, setSelectedInputDeviceId, setSelectedOutputDeviceId} = useAudioDevices();
-  const {stream, isListening, error, startListening, stopListening} = useMicrophoneInput();
-  const {volume, pitch, clarity} = usePitchDetection(stream);
+  const {stream, isListening, startListening, stopListening} = useMicrophoneInput();
+  const {pitch} = usePitchDetection(stream);
   const {initializeAudio, playNote, stopNote, stopAllNotes, isLoaded, isAudioStarted, isAudioStarting, instrument, selectInstrument, error: audioError} = useInstrumentAudio();
   const {initializeMidi, midiInputsArray, selectedMidiInputId, setSelectedMidiInputId, midiError, isMidiConnecting, isMidiReady} = useMidiInput({
     onNoteOn: (midiNumber, velocity) => activateNote(midiNumber, "midi", velocity),
     onNoteOff: midiNumber => deactivateNote(midiNumber, "midi"),
   });
 
-  const concertNote = frequencyToPitchedNote(pitch);
+  const tuning = getPitchTuning(isListening ? pitch : null);
+  const concertNote = tuning?.note ?? null;
   let trumpetNote: PitchedNote | null = null;
 
   if(concertNote === null) {
@@ -102,7 +103,7 @@ useEffect(() => {
       <button onClick={stopListening}>Stop Audio</button>
 
       <DeviceSelector inputDevices = {inputDevices} outputDevices = {outputDevices} onInputDeviceChange = {setSelectedInputDeviceId} onOutputDeviceChange={setSelectedOutputDeviceId} selectedInputDeviceId={selectedInputDeviceId} selectedOutputDeviceId={selectedOutputDeviceId}/>
-      <NoteDisplay concertNote={concertNote} trumpetNote={trumpetNote} frequency={pitch} isListening={isListening}/>
+      <NoteDisplay concertNote={concertNote} trumpetNote={trumpetNote} tuning={tuning} isListening={isListening}/>
 
     <label>
       Enstrüman
